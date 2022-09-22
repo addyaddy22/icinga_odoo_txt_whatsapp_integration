@@ -8,6 +8,7 @@ import flask
 from send_message import *
 from datetime import datetime
 from whtsap_functions import *
+from ticket_create import *
 
 app = flask.Flask(__name__)
 
@@ -46,23 +47,44 @@ def respond():
         for i in range(len(group_list)):
             if 'POP' in group_list[i]:
                 user_pop=group_list[i]
+                print(user_pop)
+                print(user_pop)        
+                send_notify = get_service_idz(user_pop)
+                print(send_notify)
+                if send_notify == 'OK':   
+                    url1 = 'https://icinga0.telco.co.zw:5665/v1/actions/acknowledge-problem?type=Host&host=' 
+                    print("done................")
+                    payload = json.dumps({
+                        "author": "icingaadmin",
+                        "comment": "Global outage. Working on it."
+                    })
+                    hostname=res['hostname']
+                    url1 += hostname
+                    print (url1)
+                    print(hostname)
+                    r = requests.post(url1, headers=headers2, auth=AUTH, data=payload, verify=False)
+                    print(r.status_code)
+            
+            elif 'Core' in group_list[i]:
+                user_group = group_list[i]
+                print('Internal notification', user_group , res['hostname'])
+                print(internal_notify(user_group, res['hostname']))
+                ticket = create_ticket(res['hostname'])
+                if user_group:
+                    url1 = 'https://icinga0.telco.co.zw:5665/v1/actions/acknowledge-problem?type=Host&host=' 
+                    print("done................")
+                    payload = json.dumps({
+                        "author": "icingaadmin",
+                        "comment": "Global outage. Working on it."
+                    })
+                    hostname=res['hostname']
+                    url1 += hostname
+                    print (url1)
+                    print(hostname)
+                    r = requests.post(url1, headers=headers2, auth=AUTH, data=payload, verify=False)
+                    print(r.status_code)
 
-        print(user_pop)        
-        send_notify = get_service_idz(user_pop)
-        print(send_notify)
-        if send_notify == 'OK':   
-            url1 = 'https://icinga0.telco.co.zw:5665/v1/actions/acknowledge-problem?type=Host&host=' 
-            print("done................")
-            payload = json.dumps({
-                "author": "icingaadmin",
-                "comment": "Global outage. Working on it."
-            })
-            hostname=res['hostname']
-            url1 += hostname
-            print (url1)
-            print(hostname)
-            r = requests.post(url1, headers=headers2, auth=AUTH, data=payload, verify=False)
-            print(r.status_code)
+            
 
     
     elif res['notification_type']=="RECOVERY":
@@ -71,6 +93,16 @@ def respond():
         
     return Response(status=200)
 
+
+def internal_notify(group, host):
+    num_list = ['0773709735','0783629597']
+    print(group, host)
+    for number in num_list:
+        print(number)
+        txt_notify = send_message(str(number),"Core Device "+ host + " is down")
+        print(txt_notify)
+        # whatsapp_notify = send_whatsapp_msg(number,"Core Device  " + host + " is down")
+        # print(whatsapp_notify)
 
 
 def get_service_idz(user_pop):

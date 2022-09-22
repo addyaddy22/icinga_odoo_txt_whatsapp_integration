@@ -34,6 +34,12 @@ headers = {
     "Authorization": "Basic b2Rvby1kZXY6MTZhMTFjNGEtZDdmYi00ZTE5LWJmYjktNzMxZDEyNDgyYzA2"
 }
 
+ticket_headers = {
+    "cookie": "session_id=8a6e73988da1205915cd56155f52fc5100fcb5ce",
+    "Content-Type": "application/json",
+    "Authorization": "Basic b2Rvby1kZXY6ZDM2NDljNmYtZDQ1MC00ODk5LTg3MmYtMTYwMDRiZTk0NTFm"
+}
+
 fb_token ='EAAF60ovMxOABAOIgD6UL51nZCyZAhhuRlGW3aZA6Cmi6RrWIOFfUw0zJjlZAH7uiUKaKsQzKWZB0RGfQIVNzxqdJL2YZCABP2Xh0erilVxb9clnZBKf5g8aZCtgVzpLTph1pHEsvY4ZCZAyF0Sr83o5hchTEXMFWGMACwCjZAaFmEGFrTvLoNLSdPZBXwzIiIq0Gywlm6ER659NM9gZDZD'
 
 fb_phone=100472189494375
