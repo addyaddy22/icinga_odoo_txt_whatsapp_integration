@@ -10,7 +10,7 @@ payload = json.dumps({
 headers = {
   'Content-Type': 'application/json',
   'Accept': 'application/json',
-  'Authorization': 'Basic cm9vdDpmYTk4ODE4ODlmNjhlOTFh'
+  'Authorization': 'xxx'
 }
 
 response = requests.request("POST", url, headers=headers, data=payload, verify=False)

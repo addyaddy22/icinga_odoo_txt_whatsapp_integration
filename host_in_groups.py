@@ -14,7 +14,7 @@ def get_service_idz():
     payload={}
     headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'Basic cm9vdDpmYTk4ODE4ODlmNjhlOTFh'
+    'Authorization': 'xxxx'
     }
 
     response = requests.request("GET", url, headers=headers, data=payload, verify=False)
@@ -28,18 +28,11 @@ def get_service_idz():
             if z:
                 if "Service_ID" in z:
                     client_service_id = z['Service_ID']
-                    print(client_service_id)
-                    print(li['results'][i]['attrs']['address'],li['results'][i]['attrs']['name'],z['Service_ID'])
                     count= count +1
-                    print(count)
                     anaytic_id = get_subscription_id(client_service_id)
-                    print(anaytic_id)
                     subscription = get_subscription_params(anaytic_id)
-                    print(subscription)
                     partner_det = get_partner_details(subscription)
-                    print(partner_det)
-                    print()
-                    print('**************')
+                    
                     
 
     except Exception as e:

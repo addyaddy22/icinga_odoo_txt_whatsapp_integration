@@ -27,82 +27,73 @@ def running():
 @app.route('/webhook', methods=['POST'])
 def respond():
     res=request.json
-    print(res)
-    print(res['alert_source'],  res['notification_type'],  res['hostname'], res['data']['host_state'], res['data']['Service_ID'],  res['data']['host_output'][:-20], res['data']['host_address'])
-    print(type(res))
-    print(res)
-    print("*******************")
     check=res['data']['Service_ID']
-    print(check)
-    # s_id="CS5426-VEL-FIR-MRR-01"
-    # partner=get_partner_id(s_id)
     pe_group = res['data']['host_groups']
-    if res['notification_type']=="PROBLEM":
-        print('This is a Problem')
-        print(pe_group)
-        print(type(pe_group))
-        group_list = pe_group.split(";")
-        print(type(group_list))
-        print(group_list)
-        for i in range(len(group_list)):
-            if 'POP' in group_list[i]:
-                user_pop=group_list[i]
-                print(user_pop)
-                print(user_pop)        
-                send_notify = get_service_idz(user_pop)
-                print(send_notify)
-                if send_notify == 'OK':   
-                    url1 = 'https://icinga0.telco.co.zw:5665/v1/actions/acknowledge-problem?type=Host&host=' 
-                    print("done................")
-                    payload = json.dumps({
-                        "author": "icingaadmin",
-                        "comment": "Global outage. Working on it."
-                    })
-                    hostname=res['hostname']
-                    url1 += hostname
-                    print (url1)
-                    print(hostname)
-                    r = requests.post(url1, headers=headers2, auth=AUTH, data=payload, verify=False)
-                    print(r.status_code)
-            
-            elif 'Core' in group_list[i]:
-                user_group = group_list[i]
-                print('Internal notification', user_group , res['hostname'])
-                print(internal_notify(user_group, res['hostname']))
-                ticket = create_ticket(res['hostname'])
-                if user_group:
-                    url1 = 'https://icinga0.telco.co.zw:5665/v1/actions/acknowledge-problem?type=Host&host=' 
-                    print("done................")
-                    payload = json.dumps({
-                        "author": "icingaadmin",
-                        "comment": "Global outage. Working on it."
-                    })
-                    hostname=res['hostname']
-                    url1 += hostname
-                    print (url1)
-                    print(hostname)
-                    r = requests.post(url1, headers=headers2, auth=AUTH, data=payload, verify=False)
-                    print(r.status_code)
-
-            
-
     
-    elif res['notification_type']=="RECOVERY":
-        print("This is a recovery stage_id: 0,")
+    try:
+        if res['notification_type']=="PROBLEM":
+            print('This is a Problem')
+            print(pe_group)
+            group_list = pe_group.split(";")
+            for i in range(len(group_list)):
+                if 'POP' in group_list[i]:
+                    user_pop=group_list[i]       
+                    send_notify = get_service_idz(user_pop)
+                    print(send_notify)
+                    if send_notify == 'OK':   
+                        url1 = f"{ICINGA_URL}/actions/acknowledge-problem?type=Host&host="
+                        print("done................")
+                        payload = json.dumps({
+                            "author": "icingaadmin",
+                            "comment": "Global outage. Working on it."
+                        })
+                        hostname=res['hostname']
+                        url1 += hostname
+                        r = requests.post(url1, headers=headers2, auth=AUTH, data=payload, verify=False)
+                        print(r.status_code)
+                
+                elif 'Core' in group_list[i] or 'Hotspot' in group_list[i]:
+                    user_group = group_list[i]
+                    print('Internal notification', user_group , res['hostname'])
+                    print(internal_notify(user_group, res['hostname']))
+                    ticket = create_ticket(res['hostname'])
+                    if user_group:
+                        url1 = f"{ICINGA_URL}/actions/acknowledge-problem?type=Host&host=" 
+                        print("done................")
+                        payload = json.dumps({
+                            "author": "icingaadmin",
+                            "comment": "Global outage. Working on it."
+                        })
+                        hostname=res['hostname']
+                        url1 += hostname
+                        r = requests.post(url1, headers=headers2, auth=AUTH, data=payload, verify=False)
+                        print(r.status_code) 
+
+
+        elif res['notification_type']=="RECOVERY":
+            print("This is a recovery stage_id: 0,")
+    
+    except Exception as e:
+        print(e)
+        pass
         
         
     return Response(status=200)
 
 
 def internal_notify(group, host):
-    num_list = ['0773709735','0783629597']
-    print(group, host)
-    for number in num_list:
-        print(number)
-        txt_notify = send_message(str(number),"Core Device "+ host + " is down")
-        print(txt_notify)
-        # whatsapp_notify = send_whatsapp_msg(number,"Core Device  " + host + " is down")
-        # print(whatsapp_notify)
+    num_list = ['0773709735','0783629597','0772128273','0782040796','0774798013','0775928314']
+    try:
+        for number in num_list:
+            print(number)
+            txt_notify = send_message(str(number),"Core Device "+ host + " is down")
+            print(txt_notify)
+            whatsapp_notify = send_whatsapp_msg(number,"Core Device  " + host + " is down")
+            print(whatsapp_notify)
+
+    except Exception as e:
+        print(e)
+        pass
 
 
 def get_service_idz(user_pop):
@@ -113,12 +104,12 @@ def get_service_idz(user_pop):
     print("date and time =", dt_string)
     # pop1 = "VainonaPOP"
     pop="Dependency_Notify_Test"
-    url = f"https://icinga0.telco.co.zw:5665/v1/objects/hosts?filter=\"{pop}\" in host.groups"
+    url = f"{ICINGA_URL}/objects/hosts?filter=\"{pop}\" in host.groups"
 
     payload={}
     headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'Basic cm9vdDpmYTk4ODE4ODlmNjhlOTFh'
+    'Authorization': 'xxx'
     }
 
     response = requests.request("GET", url, headers=headers, data=payload, verify=False)
@@ -132,26 +123,18 @@ def get_service_idz(user_pop):
                 if "Service_ID" in z:
                     client_service_id = z['Service_ID']
                     print(client_service_id)
-                    print(li['results'][i]['attrs']['address'],li['results'][i]['attrs']['name'],z['Service_ID'])
                     count= count +1
-                    print(count)
                     anaytic_id = get_subscription_id(client_service_id)
-                    print(anaytic_id)
                     subscription = get_subscription_params(anaytic_id)
-                    print(subscription)
                     partner_det = get_partner_details(subscription)
-                    print(partner_det)
-                    print(type(partner_det))
-                    print()
-                    print('**************')
                     # notify = send_message(str(partner_det),"DevOps POP is down,we sincerely apologise for the inconvinience caused due to the area fault, out team are working flat-out to resolve the issue. Thank you")
                     # print(notify)
                     message = "An Area fault Notification has been send to this contact"
                     odoo_lognote = create_res_partner_chatter_message(subscription,message,dt_string)
                     print(odoo_lognote)
                     print('********&&&&#######')
-                    send_whatsapp_msg(partner_det,'DevOps POP is down/Area Outage affecting Devz area.We sincerely apologise for the inconvenience caused by the area fault. Our team are working flat-out to resolve the issue. Please contact us on 08683012345 for more information regarding this')
-                    print(send_whatsapp_msg)
+                    # send_whatsapp_msg(partner_det,'DevOps POP is down/Area Outage affecting Devz area.We sincerely apologise for the inconvenience caused by the area fault. Our team are working flat-out to resolve the issue. Please contact us on 08683012345 for more information regarding this')
+                    # print(send_whatsapp_msg)
                     
         return 'OK'
 

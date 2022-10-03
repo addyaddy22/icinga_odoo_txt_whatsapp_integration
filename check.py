@@ -19,14 +19,14 @@ from datetime import datetime
 SERVER_URL = 'http://154.119.80.8:7500'
 DB_NAME = 'odoo_ash'
 USERNAME = 'developer@telco.co.zw'
-PASSWORD = 's3rv3r5mx'
+PASSWORD = 'xxxx'
 
 
 url = "https://sandbox.ipos.co.zw/api/v1/helpdesk_ticketing/helpdesk.ticket"
 headers = {
     "cookie": "session_id=bad780cd5a14a881866a0eec1bbdcb313fad4dce",
     "Content-Type": "application/json",
-    "Authorization": "Basic b2Rvby1kZXY6MTZhMTFjNGEtZDdmYi00ZTE5LWJmYjktNzMxZDEyNDgyYzA2"
+    "Authorization": "xxx"
 }
 
 info = xmlrpc.client.ServerProxy('https://demo.odoo.com/start').start()
