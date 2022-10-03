@@ -2,8 +2,7 @@ import requests
 import json
 from constants import *
 
-# USER='odoo-dev'
-# KEY='d3649c6f-d450-4899-872f-16004be9451f'
+
 
 def get_service_idz():
 
